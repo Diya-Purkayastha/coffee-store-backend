@@ -11,14 +11,21 @@ const SignUp = () => {
         e.preventDefault();
         const form = e.target;
         const formData = new FormData(form);
-        const { email, password, ...userProfile } = Object.fromEntries(formData.entries());
-        // const email = formData.get('email');
-        // const password = formData.get('password');
+        const { email, password, ...rest } = Object.fromEntries(formData.entries());
+
 
         //create user
         createUser(email, password)
-            .then(res => {
-                console.log(res.user);
+            .then(result => {
+                console.log(result.user);
+                const userProfile = {
+                    email,
+                    ...rest,
+                    creationTime: result.user?.metadata?.creationTime,
+                    lastSignInTime: result.user?.metadata?.lastSignInTime
+
+                }
+
 
                 //send to server info
                 fetch('http://localhost:3000/users', {
@@ -32,7 +39,7 @@ const SignUp = () => {
                     .then(res => res.json())
                     .then(data => {
                         if (data.insertedId) {
-                            
+
                             Swal.fire({
                                 position: "top-end",
                                 icon: "success",
